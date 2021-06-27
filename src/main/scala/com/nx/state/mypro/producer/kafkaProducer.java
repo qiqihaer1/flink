@@ -35,7 +35,7 @@ public class kafkaProducer {
             //同步的方式，往Kafka里面生产数据
            producer.send(new ProducerRecord<String, String>(topic,message));
             System.out.println(message);
-            Thread.sleep(10000);
+            Thread.sleep(15000);
         }
         //关闭链接
 //        producer.close();

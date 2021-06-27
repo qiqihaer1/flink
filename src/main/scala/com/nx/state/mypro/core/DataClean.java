@@ -91,14 +91,10 @@ public class DataClean {
          * ETL处理
          */
         SingleOutputStreamOperator<String> etlData = allData.connect(mapData).flatMap(new CoFlatMapFunction<String, HashMap<String, String>, String>() {
-
-
             HashMap<String, String> allMap = new HashMap<String, String>();
-
             //里面处理的是kafka的数据
             @Override
             public void flatMap1(String line, Collector<String> out) throws Exception {
-
                 JSONObject jsonObject = JSONObject.parseObject(line);
                 String dt = jsonObject.getString("dt");
                 String countryCode = jsonObject.getString("countryCode");
@@ -113,8 +109,6 @@ public class DataClean {
                     //下游获取到数据的时候，也就是一个json格式的数据
                     out.collect(dataObject.toJSONString());
                 }
-
-
             }
 
             //里面处理的是redis里面的数据
