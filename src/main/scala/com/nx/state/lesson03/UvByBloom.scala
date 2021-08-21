@@ -2,14 +2,13 @@ package com.nx.state.lesson03
 
 import java.sql.Timestamp
 
-
 import com.nx.state.utils.Utils
-
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.scala.function.ProcessWindowFunction
+import org.apache.flink.streaming.api.windowing.assigners.{SlidingEventTimeWindows, TumblingEventTimeWindows}
 import org.apache.flink.streaming.api.windowing.time.Time
-import org.apache.flink.streaming.api.windowing.triggers.{Trigger, TriggerResult}
+import org.apache.flink.streaming.api.windowing.triggers.{ContinuousEventTimeTrigger, Trigger, TriggerResult}
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
 import redis.clients.jedis.Jedis
@@ -42,7 +41,10 @@ object UvByBloom {
       .map(data => ("key", data.userId)) //把数据变为key,value结构
       .keyBy(_._1) //按照key进行分组（注意：如果数据量特别大，添加一个随机的前缀进行处理）
       .timeWindow(Time.hours(1)) //窗口是1小时
+//      .countWindow(10) //窗口是1小时
+//      .window(SlidingEventTimeWindows.of(Time.days(1),Time.seconds(60)))
       .trigger(new MyTrigger()) //每来来一条数据都会更新一下结果
+//      .trigger(ContinuousEventTimeTrigger.of(Time.seconds(10)))
       .process(new UvCountWithBloom())
       .print()
 
@@ -73,6 +75,7 @@ class Bloom(size: Long) extends Serializable {
   
   //1后面28个0
   private val cap = if (size > 0) size else 1 << 28
+  private val integer: Int = 1 << 28
 
   //定义hash函数的结果，当做位图的offset
   def hash(value: String, seed: Int): Long = {
@@ -86,6 +89,7 @@ class Bloom(size: Long) extends Serializable {
   }
 }
 
+
 class UvCountWithBloom() extends ProcessWindowFunction[(String, Long), Tuple2[String,Long], String, TimeWindow]{
   // 定义redis连接
   lazy val jedis = new Jedis("localhost", 6379)
@@ -95,11 +99,11 @@ class UvCountWithBloom() extends ProcessWindowFunction[(String, Long), Tuple2[St
   lazy val bloom = new Bloom(1<<28)
 
   override def process(key: String, context: Context,
-      elements: Iterable[(String, Long)], out: Collector[Tuple2[String,Long]]): Unit = {
+                       elements: Iterable[(String, Long)], out: Collector[Tuple2[String,Long]]): Unit = {
     // 位图的存储方式，key是windowEnd，value是bitmap
     //val storeKey = context.window.getEnd.toString
     val storeKey =new Timestamp(context.window.getEnd).toString
-    
+
     var count = 0L
     // 把每个窗口的uv count值也存入名为count的redis表，
     // 存放内容为（windowEnd -> uvCount），所以要先从redis中读取
@@ -122,4 +126,8 @@ class UvCountWithBloom() extends ProcessWindowFunction[(String, Long), Tuple2[St
     }
   }
 }
+
+
+
+
 

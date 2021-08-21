@@ -61,7 +61,7 @@ object SinkTest {
     /**
      * kafka+keyby+min
      */
-    val stream = env.addSource(kafkaConsumer011).map(json2TempretureLog(_)).keyBy(_.country).minBy("temp")
+    val stream = env.addSource(kafkaConsumer011).map(json2TempretureLog(_)).keyBy(_.country).minBy("temprature")
 
     /**
      * sink = csv
@@ -96,7 +96,7 @@ object SinkTest {
 //      //将id指定为key
 //      override def getKeyFromData(data: sourceTemperature): String = data.country
 //      //将温度值指定为value
-//      override def getValueFromData(data: sourceTemperature): String = data.temp.toString
+//      override def getValueFromData(data: sourceTemperature): String = data.temprature.toString
 //    }))
     /**
      * sink = es
@@ -107,11 +107,11 @@ object SinkTest {
 //      override def process(element: sourceTemperature, ctx: RuntimeContext, indexer: RequestIndexer): Unit = {
 //        //包装数据作为data source
 //        val country = element.country
-//        val temp = element.temp
+//        val temprature = element.temprature
 //        val dt = element.dt
 //        val map = new util.HashMap[String, String]()
 //        map.put("country",country)
-//        map.put("temperature",temp.toString)
+//        map.put("temperature",temprature.toString)
 //        map.put("dt",dt)
 //        //创建index request,用于发送http请求
 //        val request = Requests.indexRequest()

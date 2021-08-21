@@ -1,6 +1,8 @@
 package com.symbio.study.utils
 
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import java.time.{LocalDateTime, ZoneOffset}
 import java.util.{Date, Properties, Random}
 
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
@@ -16,33 +18,33 @@ object kafkaProductor {
     prop.put("key.serializer", classOf[StringSerializer].getName)
     prop.put("value.serializer", classOf[StringSerializer].getName)
     //指定topic名称
-    val topic = "from_flume01"
+    val topic = "from_flume1"
 
     //创建producer链接
     val producer = new KafkaProducer[String, String](prop)
 
     //producer发出消息
     while (true) {
-      val message = "{\"dt\":\"" + getCurrentTime + "\",\"countryCode\":\"" + getCountryCode + "\",\"site\":\""+getRandomType+"\",\"temperature\":\""+getRandomTemperatureType+"\"}"
+      val message = "{\"timestamp\":\"" + getCurrentTimestamp + "\",\"countryCode\":\"" + getCountryCode + "\",\"site\":\""+getRandomType+"\",\"temperature\":\""+getRandomTemperatureType+"\"}"
       //同步的方式，往Kafka里面生产数据
       producer.send(new ProducerRecord[String, String](topic, message))
       System.out.println(message)
-      Thread.sleep(30000)
+      Thread.sleep(300000)
     }
     //关闭链接
     //        producer.close();
-
-
   }
 
 
-  def getCurrentTime: String = {
-    val format ="YYYY-MM-dd HH:mm:ss"
-    val sdf = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss")
-    sdf.format(new Date)
-//    val time: LocalDateTime = new LocalDateTime()
-//    val str: String = DateTimeFormatter.ofPattern(format).format(time)
-//    str
+
+  def getCurrentTimestamp: String = {
+//    val formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss")
+//    val time: LocalDateTime = LocalDateTime.now()
+//    val timestamp: Long = time.toInstant(ZoneOffset.of("+8")).toEpochMilli()
+//    val dateTime: String = time.format(formatter)
+//    dateTime
+    val time = System.currentTimeMillis
+    time.toString
   }
 
   def getCountryCode: String = {

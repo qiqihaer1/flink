@@ -1,8 +1,10 @@
 package com.nx.streaming.lesson02;
 
 
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 
@@ -38,6 +40,10 @@ public class TestKeyedStateMain3 {
                 .keyBy(0)
                 .flatMap(new ContainsValueFunction())
                 .print();
+
+
+        dataStreamSource
+                .keyBy(0).print();
 
 
         env.execute("TestStatefulApi");

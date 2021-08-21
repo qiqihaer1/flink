@@ -69,7 +69,7 @@ object TransformTest {
 //    }).assignTimestampsAndWatermarks(new TimeExtractor) //设置水位，允许数据迟到10秒
 //      .keyBy(_.country)
 //      .timeWindow(Time.seconds(60),Time.seconds(15)) //设置窗口60s,滑动窗口5s
-//      .minBy("temp").print()
+//      .minBy("temprature").print()
 
 //    /**
 //     * kafka+reduce
@@ -83,7 +83,7 @@ object TransformTest {
 //      .timeWindow(Time.seconds(180),Time.seconds(60)) //设置窗口60s,滑动窗口5s
 //      .reduce((last,now)=>{
 //        //拿到当前key的最大温度
-//        val flag = last.temp > now.temp
+//        val flag = last.temprature > now.temprature
 //        if(flag) last else now
 //      }).print()
 
